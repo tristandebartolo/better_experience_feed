@@ -1,6 +1,6 @@
 ## Better Experience Feed
 
-> This module gives the possibility to create dynamically flus rss blocks.
+> This module gives the possibility to create dynamically flux rss blocks.
 
 3 list modes:
  - Local content,
