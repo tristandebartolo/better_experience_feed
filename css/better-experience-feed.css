@@ -1,0 +1,35 @@
+.better-experience-url-options .better-experience-class-hyde,
+.better-experience-type-of-content.better-experience-class-hyde{
+    display: none;
+}
+
+.better-experience-type-of-request,
+.better-experience-url-options,
+.better-experience-type-of-content{
+    display: block;
+    
+}
+
+.better-experience-type-of-order,
+.better-experience-type-of-order-asc,
+.better-experience-number-of-items{
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.better-experience-url-of-feed,
+.better-experience-url-of-feed {
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.better-experience-url-of-feed #edit-settings-url-options-url-feed-info{
+    min-height: 30px;
+    border-radius: 2px;
+    min-width: 100px;
+    /* border: 1px solid #b8b8b8; */
+}
+
+.better-experience-url-of-feed #edit-settings-url-options-url-feed-info option {
+    padding: 4px 0;
+}

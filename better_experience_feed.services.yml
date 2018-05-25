@@ -1,0 +1,4 @@
+services:
+  better_experience_feed.request_system:
+    class: Drupal\better_experience_feed\BetterExperienceService
+    arguments: []

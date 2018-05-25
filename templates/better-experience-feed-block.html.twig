@@ -1,0 +1,26 @@
+{#
+/**
+ * @file
+ * Display an feed with alterable components.
+ */
+#}
+{% if (type_request == 1) and (options_request.url_feed_info == 0) %}
+    {% if info.title %}
+        <h4><strong><a href="{{info.link|trim}}">{{info.title}}</a></strong></h4>
+    {% endif %}
+    {% for item in data %}
+        <a href="{{item.link|trim}}">{{ item.title|length > 50 ? item.title|slice(0, 50) ~ '…' : item.title }}</a>
+        <p>
+            {{ item.description|length > 100 ? item.description|slice(0, 100) ~ '…' : item.description }}
+            <span>{{item.date|date("m/d/Y")}}</span>
+        </p>
+    {% endfor %} 
+{% else %}
+    {% for item in data|slice(0, options_request.number_of_items) %}
+        <a href="{{item.link|trim}}">{{ item.title|length > 50 ? item.title|slice(0,50) ~ '…' : item.title }}</a>
+        <p>
+            {{ item.description|length > 100 ? item.description|slice(0, 100) ~ '…' : item.description }}
+            <span>{{item.date|date("m/d/Y")}}</span>
+        </p>
+    {% endfor %}       
+{% endif %}

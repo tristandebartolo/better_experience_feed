@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ * Contains better_experience_feed.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function better_experience_feed_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the better_experience_feed module.
+    case 'help.page.better_experience_feed':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Between Database and External Feed rss') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function better_experience_feed_theme($existing, $type, $theme, $path) {
+  return [
+    'better_experience_feed_block' => [
+      'variables' => [
+        'info' => [],
+        'data' => [],
+        'type_request' => 0,
+        'options_request' => [],
+        'attributes' => [
+          'class' => ['better-experience-feed-block'],
+        ],
+      ],
+    ],
+  ];
+}

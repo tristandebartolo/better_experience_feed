@@ -1,0 +1,6 @@
+betterexperienceadmin:
+  css:
+    theme:
+      css/better-experience-feed.css: {}
+  js:
+    js/better-experience-feed.js: {}

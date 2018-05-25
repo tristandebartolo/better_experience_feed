@@ -1,0 +1,5 @@
+name: 'Better Experience feed'
+type: module
+description: 'Mix database and external Feed rss'
+core: 8.x
+package: 'MM'
