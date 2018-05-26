@@ -22,6 +22,8 @@ Some configurations are possible:
  - Order list items by date or title,
  - Choose the number of items in the lists
 
+## Rss tested
+
 France TV info
  https://www.francetvinfo.fr/rss/
  https://www.francetvinfo.fr/politique.rss
