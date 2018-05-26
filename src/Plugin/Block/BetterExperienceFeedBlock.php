@@ -111,7 +111,7 @@ class BetterExperienceFeedBlock extends BlockBase {
       '#type' => 'select',
       '#title' => $this->t('Type of content'),
       '#options' => $contentTypesList,
-      '#default_value' => (isset($contentTypesList['article'])) ? 'article' : '',
+      '#default_value' => (isset($this->configuration['type_of_content'])) ? $this->configuration['type_of_content'] : 'article',
       '#description' => $this->t('Choose a content type if local or both option.'),
       '#prefix' => '<div class="better-experience-type-of-content">',
       '#suffix' => '</div>',
