@@ -9,17 +9,17 @@
         <h4><strong><a href="{{info.link|trim}}">{{info.title}}</a></strong></h4>
     {% endif %}
     {% for item in data %}
-        <a href="{{item.link|trim}}">{{ item.title|length > 50 ? item.title|slice(0, 50) ~ '…' : item.title }}</a>
+        <a href="{{item.link|trim}}"><strong>{{ item.title|length > 80 ? item.title|slice(0, 80) ~ '…' : item.title }}</strong></a>
         <p>
-            {{ item.description|length > 100 ? item.description|slice(0, 100) ~ '…' : item.description }}
+            {{ item.description|length > 120 ? item.description|slice(0, 120) ~ '…' : item.description }}
             <span>{{item.date|date("m/d/Y")}}</span>
         </p>
     {% endfor %} 
 {% else %}
     {% for item in data|slice(0, options_request.number_of_items) %}
-        <a href="{{item.link|trim}}">{{ item.title|length > 50 ? item.title|slice(0,50) ~ '…' : item.title }}</a>
+        <a href="{{item.link|trim}}"><strong>{{ item.title|length > 80 ? item.title|slice(0, 80) ~ '…' : item.title }}</strong></a>
         <p>
-            {{ item.description|length > 100 ? item.description|slice(0, 100) ~ '…' : item.description }}
+            {{ item.description|length > 120 ? item.description|slice(0, 120) ~ '…' : item.description }}
             <span>{{item.date|date("m/d/Y")}}</span>
         </p>
     {% endfor %}       

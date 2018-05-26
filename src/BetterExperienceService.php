@@ -48,20 +48,20 @@ class BetterExperienceService implements BetterExperienceServiceInterface {
 		$contentRss = ($this->getContentTypeRss($content_type, $options_request) != null) ? $this->getContentTypeRss($content_type, $options_request)->data : [];
 		$urlRss = ($this->getUrlRss($url_of_feed, $options_request) != null) ?  $this->getContentTypeRss($content_type, $options_request)->data : [];
 		// reset number for thiw variable list
-			$options_request->number_of_items = $num;
-			// Merge all data in a big array
-			$build_flux['data'] = array_merge($contentRss, $urlRss);
-			if ($build_flux['data'] != null) {
-				// Filter function
-				uasort($build_flux['data'], [
-					'Drupal\better_experience_feed\Utility\SortBetterExperienceFeed',
-					$options_request->order_by_type
-				]);
-			}
-			// Order Fonction
-			$build_flux['data'] = $this->reverseList($options_request->order_asc_des, $build_flux['data']);
-			// return it
-			return (object) $build_flux;
+		$options_request->number_of_items = $num;
+		// Merge all data in a big array
+		$build_flux['data'] = array_merge($contentRss, $urlRss);
+		if ($build_flux['data'] != null) {
+			// Filter function
+			uasort($build_flux['data'], [
+				'Drupal\better_experience_feed\Utility\SortBetterExperienceFeed',
+				$options_request->order_by_type
+			]);
+		}
+		// Order Fonction
+		$build_flux['data'] = $this->reverseList($options_request->order_asc_des, $build_flux['data']);
+		// return it
+		return (object) $build_flux;
    
   }
   
@@ -130,40 +130,21 @@ class BetterExperienceService implements BetterExperienceServiceInterface {
 		$build_flux = [];
 		// If the rss url is not valid return a massage
 		$fluxRss = simplexml_load_file($urlRss);
-
+		// ksm($fluxRss);
 		if ($fluxRss) {
-			// Else prepare and build the Info Rss Owner Information array
-			$rss_title = (isset($fluxRss->channel->title)) ? $fluxRss->channel->title->__toString() : '';
-			$rss_description = (isset($fluxRss->channel->description)) ? $fluxRss->channel->description->__toString() : '';
-			$rss_link = (isset($fluxRss->channel->link)) ? $fluxRss->channel->link->__toString() : '';
-			$rss_pubDate = (isset($fluxRss->channel->pubDate)) ? $this->convertDateDrupal($fluxRss->channel->pubDate->__toString()) : '';
-			// Store the info Owner Rss
-			$build_flux['info'] = [
-				'title' => $rss_title,
-				'description' => $rss_description,
-				'link' => $rss_link,
-				'date' => $rss_pubDate
-			];
-			// Limit status
-			$a = 1;
-			// And process each items
-			foreach ($fluxRss->channel->item as $item => $i)
-			{
-				// prepare article information
-				$i_title = (isset($i->title)) ? $i->title->__toString() : '';
-				$i_description = (isset($i->description)) ? $i->description->__toString() : '';
-				$i_link = (isset($i->link)) ? $i->link->__toString() : '';
-				$i_pubDate = (isset($i->pubDate)) ? $this->convertDateDrupal($i->pubDate->__toString()) : '';
-				// Store listed article
-				$build_flux['data'][] = [
-					'title' => $i_title,
-					'description' => $i_description,
-					'link' => $i_link,
-					'date' => $i_pubDate
-				];
-				// Limit status end
-				if ($a++ == $options_request->number_of_items) break;
+			if ($fluxRss->channel) {
+				$info = $this->getRssChannelInformation($fluxRss->channel);
+				$items = $this->processItemsRss($fluxRss->channel->item, $options_request->number_of_items);
+				$build_flux = array_merge($items, $info);
+			}elseif ($fluxRss->entry) {
+				// ksm($fluxRss->entry);
+				$info = $this->getRssEntryInformation($fluxRss);
+				$items = $this->processItemsRss($fluxRss, $options_request->number_of_items);
+				$build_flux = array_merge($items, $info);
+			}else{
+				$build_flux['info']['title'] = 'Somethings is wrong! Perhaps the url is not valid.';
 			}
+
 			if ($build_flux['data'] != null) {
 				// Filter function
 				uasort($build_flux['data'], [
@@ -178,7 +159,7 @@ class BetterExperienceService implements BetterExperienceServiceInterface {
 		}
   }
   
-  	/**
+  /**
    * Constructs a Url request Rss flux.
 	 * @param $urlRss
 	 * url feed
@@ -190,6 +171,122 @@ class BetterExperienceService implements BetterExperienceServiceInterface {
       $build_flux = array_reverse($build_flux);
     }
 		return $build_flux;
+	}
+
+	/**
+   * Request the information of the owner
+	 * @param $info
+	 * information of feed owner
+	 * @return array
+   */
+	public function getRssChannelInformation($info)
+	{
+		$build_flux = [];
+
+    if ($info) {
+			// prepare and build the Info Rss Owner Information array
+			$rss_title = (isset($info->title)) ? $info->title->__toString() : '';
+			$rss_description = (isset($info->description)) ? $info->description->__toString() : '';
+			$rss_link = (isset($info->link->attribut)) ? $info->link->__toString() : '';
+			$rss_pubDate = (isset($info->pubDate)) ? $this->convertDateDrupal($info->pubDate->__toString()) : '';
+			$img_url = (isset($info->image)) ? $info->image->url->__toString() : null;
+			// Store the info Owner Rss
+			$build_flux['info'] = [
+				'title' => $rss_title,
+				'description' => $rss_description,
+				'link' => $rss_link,
+				'date' => $rss_pubDate,
+				'img' => $img_url
+			];
+    }
+		return $build_flux;
+	}
+
+	/**
+   * Request the information of the owner
+	 * @param $info
+	 * information of feed owner
+	 * @return array
+   */
+	public function getRssEntryInformation($info)
+	{
+		$build_flux = [];
+
+    if ($info) {
+			// prepare and build the Info Rss Owner Information array
+			$rss_title = (isset($info->title)) ? $info->title->__toString() : '';
+			$rss_description = (isset($info->description)) ? strip_tags($info->description->__toString()) : '';
+			$rss_link = (isset($info->link[0])) ? $info->link[0]->attributes()['href']->__toString() : '';
+			$img_url = (isset($info->link[1])) ? $info->link[1]->attributes()['href']->__toString() : '';
+			$rss_pubDate = (isset($info->updated)) ? $this->convertDateDrupal($info->updated->__toString()) : '';
+			// $img_url = (isset($info->image)) ? $info->image->url->__toString() : null;
+			// Store the info Owner Rss
+			$build_flux['info'] = [
+				'title' => $rss_title,
+				'description' => $rss_description,
+				'link' => $rss_link,
+				'date' => $rss_pubDate,
+				// 'img' => $img_url
+			];
+    }
+		return $build_flux;
+	}
+
+	/**
+   * Request Items aticles
+	 * @param $items
+	 * date to process
+	 * @return array
+   */
+	public function processItemsRss($items, $options_request)
+	{
+		$build_items = [];
+
+		$i_link = null;
+		$i_img = null;
+		$i_pubDate = null;
+		$i_description = null;
+		$i_title = null;
+
+    if ($items) {
+			// Limit status
+			$a = 1;
+			// And process each items
+			foreach ($items as $i)
+			{
+				
+				if ($i->enclosure) {
+					$i_link = (isset($i->link)) ? $i->link->__toString() : '';
+					$i_img = $i->enclosure->attributes()['url']->__toString();
+					$i_pubDate = (isset($i->pubDate)) ? $this->convertDateDrupal($i->pubDate->__toString()) : '';
+					$i_description = (isset($i->description)) ? strip_tags($i->description->__toString()) : '';
+					$i_title = (isset($i->title)) ? $i->title->__toString() : '';
+				}elseif($i->link){
+					// ksm($i);
+					$i_link = (isset($i->link[0])) ? $i->link[0]->attributes()['href']->__toString() : '';
+					$i_img = (isset($i->link[1])) ? $i->link[1]->attributes()['href']->__toString() : '';
+					$i_pubDate = (isset($i->updated)) ? $this->convertDateDrupal($i->updated->__toString()) : '';
+					$i_description = (isset($i->summary)) ? strip_tags($i->summary->__toString()) : '';
+					$i_title = (isset($i->title)) ? $i->title->__toString() : '';
+				}else{
+					$i_title = null;
+				}
+
+				if ($i_title != null) {
+					// Store listed article
+					$build_items['data'][] = [
+						'title' => $i_title,
+						'description' => $i_description,
+						'link' => $i_link,
+						'date' => $i_pubDate,
+						'img' => $i_img,
+					];
+					// Limit status end
+					if ($a++ == $options_request) break;
+				}	
+			}
+    }
+		return $build_items;
 	}
 
 }
